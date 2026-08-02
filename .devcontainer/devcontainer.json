@@ -1,0 +1,36 @@
+{
+  "name": "Chroniqor Development",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.yml"
+  ],
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/chroniqor",
+  "runServices": [
+    "workspace",
+    "postgres"
+  ],
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "files.eol": "\n"
+      }
+    }
+  },
+  "forwardPorts": [
+    8080,
+    5432
+  ],
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.gradle && ./gradlew --version",
+  "remoteUser": "vscode"
+}
