@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+set -eu
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
+run_gradle() {
+	if [ -x "./gradlew" ]; then
+		./gradlew "$@"
+	elif command -v cmd.exe >/dev/null 2>&1 && [ -f "./gradlew.bat" ]; then
+		cmd.exe /c gradlew.bat "$@"
+	else
+		echo "No se encontro un Gradle Wrapper ejecutable." >&2
+		exit 1
+	fi
+}
+
+if run_gradle spotlessCheck --no-daemon; then
+	exit 0
+fi
+
+echo ""
+echo "Spotless encontro problemas de formato. Aplicando formato..."
+run_gradle spotlessApply --no-daemon
+
+echo ""
+echo "Formato aplicado. Revisa los cambios, ejecuta git add y vuelve a ejecutar git commit."
+exit 1
