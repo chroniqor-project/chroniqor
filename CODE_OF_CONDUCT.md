@@ -33,3 +33,15 @@ content that violates this policy.
 
 Repeated or severe violations may result in temporary or permanent restriction
 from participating in the project.
+
+## Contact
+
+For general contribution questions, use GitHub Issues.
+
+For private concerns regarding conduct or sensitive contribution matters,
+contact the Project Lead at:
+
+**Email:** [chroniqor.project@gmail.com](mailto:chroniqor.project@gmail.com)
+
+Security vulnerabilities must be reported through GitHub Private Vulnerability
+Reporting as described in [SECURITY.md](SECURITY.md).
