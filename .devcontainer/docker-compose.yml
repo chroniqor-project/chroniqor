@@ -1,0 +1,26 @@
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+
+    command: sleep infinity
+
+    volumes:
+      - .:/workspaces/chroniqor:cached
+      - chroniqor-gradle-cache:/home/vscode/.gradle
+
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      CHRONIQOR_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-chroniqor}
+      CHRONIQOR_DB_USERNAME: ${POSTGRES_USER:-chroniqor}
+      CHRONIQOR_DB_PASSWORD: ${POSTGRES_PASSWORD:-chroniqor_dev}
+      TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
+      TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  chroniqor-gradle-cache:

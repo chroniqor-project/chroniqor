@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: ${CHRONIQOR_DB_URL:jdbc:postgresql://localhost:5432/chroniqor}
+    username: ${CHRONIQOR_DB_USERNAME:chroniqor}
+    password: ${CHRONIQOR_DB_PASSWORD:chroniqor_dev}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
