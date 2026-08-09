@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.Test
 val verboseTestLogging = providers.gradleProperty("verboseTestLogging").isPresent
 
 dependencies {
-	testImplementation(platform("org.junit:junit-bom:5.13.4"))
+	testImplementation(platform("org.junit:junit-bom:6.1.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
 	testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
