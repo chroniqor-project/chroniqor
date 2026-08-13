@@ -51,7 +51,7 @@ public record DatasetIdentity(
         Objects.requireNonNull(value, fieldName + " must not be null");
 
         if (value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + "must not be blank");
+            throw new IllegalArgumentException(fieldName + " must not be blank");
         }
 
         if (!value.equals(value.trim())) {
