@@ -24,9 +24,9 @@ public final class ReplayEngine {
 
         Objects.requireNonNull(strategy, "Strategy must not be null");
 
-        MarketBar fitsBar = dataset.bars().getFirst();
+        MarketBar firstBar = dataset.bars().getFirst();
 
-        VirtualClock clock = new VirtualClock(fitsBar.startTime());
+        VirtualClock clock = new VirtualClock(firstBar.startTime());
 
         List<ReplayStep> steps = new ArrayList<>(dataset.size());
 
@@ -46,9 +46,27 @@ public final class ReplayEngine {
 
             steps.add(new ReplayStep(index, clock.now(), currentBar, decision));
         }
+        validateReplaySteps(dataset, steps);
+
         Instant completeAt = clock.now();
 
-        return new ReplayResult(dataset.identity(), strategy.metadata(), fitsBar.startTime(), completeAt, steps);
+        return new ReplayResult(dataset.identity(), strategy.metadata(), firstBar.startTime(), completeAt, steps);
+    }
+
+    private static void validateReplaySteps(MarketDataset dataset, List<ReplayStep> steps) {
+        if (steps.size() != dataset.size()) {
+            throw new IllegalStateException("Replay step count must match dataset bar count");
+        }
+
+        for (int i = 0; i < dataset.size(); i++) {
+            MarketBar expectedBar = dataset.bars().get(i);
+            MarketBar actualBar = steps.get(i).currentBar();
+
+            if (!actualBar.equals(expectedBar)) {
+                throw new IllegalStateException(
+                        "Replay step at index " + i + " does not correspond to the expected dataset bar");
+            }
+        }
     }
 
     private static void requireSynchronizedTime(VirtualClock clock, StrategyContext context) {

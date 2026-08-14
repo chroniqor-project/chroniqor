@@ -64,6 +64,55 @@ class ReplayEngineTest {
     }
 
     @Test
+    @DisplayName("starts at the first bar start time")
+    void shouldStartAtFirstBarStartTime() {
+        MarketDataset dataset = dataset(bar("2026-01-01T10:00:00Z", "1.1000"));
+
+        ReplayResult result = new ReplayEngine().run(dataset, new NoOpStrategy(STRATEGY));
+
+        assertEquals(dataset.bars().getFirst().startTime(), result.startedAt());
+    }
+
+    @Test
+    @DisplayName("completes at the final bar availability time")
+    void shouldCompleteAtLastBarAvailabilityTime() {
+        MarketDataset dataset = dataset(bar("2026-01-01T10:00:00Z", "1.1000"), bar("2026-01-01T10:01:00Z", "1.1001"));
+
+        ReplayResult result = new ReplayEngine().run(dataset, new NoOpStrategy(STRATEGY));
+
+        assertEquals(dataset.bars().getLast().availableAt(), result.completedAt());
+    }
+
+    @Test
+    @DisplayName("produces the same result when the engine instance is reused")
+    void shouldProduceSameResultWhenEngineInstanceIsReused() {
+        MarketDataset dataset = dataset(bar("2026-01-01T10:00:00Z", "1.1000"), bar("2026-01-01T10:01:00Z", "1.1001"));
+        ReplayEngine engine = new ReplayEngine();
+        NoOpStrategy strategy = new NoOpStrategy(STRATEGY);
+
+        ReplayResult first = engine.run(dataset, strategy);
+        ReplayResult second = engine.run(dataset, strategy);
+
+        assertEquals(first, second);
+    }
+
+    @Test
+    @DisplayName("rejects a replay result with an unrelated start time")
+    void shouldRejectStartTimeDifferentFromFirstBarStartTime() {
+        MarketDataset dataset = dataset(bar("2026-01-01T10:00:00Z", "1.1000"));
+        ReplayResult valid = new ReplayEngine().run(dataset, new NoOpStrategy(STRATEGY));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new ReplayResult(
+                        valid.dataset(),
+                        valid.strategy(),
+                        valid.startedAt().minusSeconds(1),
+                        valid.completedAt(),
+                        valid.steps()));
+    }
+
+    @Test
     @DisplayName("records no action for the no-op strategy")
     void shouldRecordNoAction() {
         MarketDataset dataset = dataset(bar("2026-01-01T10:00:00Z", "1.1000"));
