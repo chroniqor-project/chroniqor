@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Chroniqor contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package chroniqor.core.replay;
 
 import java.time.Instant;
@@ -8,11 +13,7 @@ public final class VirtualClock {
     private Instant currentTime;
 
     public VirtualClock(Instant initialTime) {
-        this.currentTime =
-                Objects.requireNonNull(
-                        initialTime,
-                        "Initial virtual time must not be null"
-                );
+        this.currentTime = Objects.requireNonNull(initialTime, "Initial virtual time must not be null");
     }
 
     public Instant now() {
@@ -20,15 +21,10 @@ public final class VirtualClock {
     }
 
     public void advanceTo(Instant targetTime) {
-        Objects.requireNonNull(
-                targetTime,
-                "Target virtual time must not be null"
-        );
+        Objects.requireNonNull(targetTime, "Target virtual time must not be null");
 
         if (targetTime.isBefore(currentTime)) {
-            throw new IllegalArgumentException(
-                    "Virtual clock cannot move backwards"
-            );
+            throw new IllegalArgumentException("Virtual clock cannot move backwards");
         }
 
         currentTime = targetTime;
