@@ -8,7 +8,7 @@ dependencies {
 	testImplementation(platform("org.junit:junit-bom:6.1.3"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
-	testImplementation("com.tngtech.archunit:archunit-junit5:1.4.2")
+	testImplementation("com.tngtech.archunit:archunit-junit5:1.5.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
