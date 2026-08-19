@@ -6,5 +6,10 @@
 package chroniqor.core.strategy;
 
 public enum NoAction implements StrategyDecision {
-    INSTANCE
+    INSTANCE;
+
+    @Override
+    public String code() {
+        return "NOT_ACTION";
+    }
 }

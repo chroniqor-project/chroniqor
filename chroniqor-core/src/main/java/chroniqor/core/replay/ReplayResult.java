@@ -5,6 +5,7 @@
 
 package chroniqor.core.replay;
 
+import chroniqor.core.audit.AuditTrail;
 import chroniqor.core.dataset.DatasetIdentity;
 import chroniqor.core.strategy.StrategyMetadata;
 import java.time.Instant;
@@ -16,7 +17,8 @@ public record ReplayResult(
         StrategyMetadata strategy,
         Instant startedAt,
         Instant completedAt,
-        List<ReplayStep> steps) {
+        List<ReplayStep> steps,
+        AuditTrail auditTrail) {
 
     public ReplayResult {
         Objects.requireNonNull(dataset, "Replay dataset identity must not be null");
@@ -24,6 +26,7 @@ public record ReplayResult(
         Objects.requireNonNull(startedAt, "Replay start time must not be null");
         Objects.requireNonNull(completedAt, "Replay completion time must not be null");
         Objects.requireNonNull(steps, "Replay steps must not be null");
+        Objects.requireNonNull(auditTrail, "Replay audit trail must not be null");
 
         steps = List.copyOf(steps);
 
@@ -45,6 +48,15 @@ public record ReplayResult(
 
         if (steps.size() != dataset.barCount()) {
             throw new IllegalArgumentException("Replay step count must match dataset bar count");
+        }
+
+        if (!auditTrail.events().getFirst().marketTime().equals(startedAt)) {
+
+            throw new IllegalArgumentException("Audit trail must start at replay start time");
+        }
+        if (!auditTrail.events().getLast().marketTime().equals(completedAt)) {
+
+            throw new IllegalArgumentException("Audit trail must complete at replay completion time");
         }
 
         validateSteps(steps);

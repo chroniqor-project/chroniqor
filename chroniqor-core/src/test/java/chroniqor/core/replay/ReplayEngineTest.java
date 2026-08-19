@@ -109,7 +109,8 @@ class ReplayEngineTest {
                         valid.strategy(),
                         valid.startedAt().minusSeconds(1),
                         valid.completedAt(),
-                        valid.steps()));
+                        valid.steps(),
+                        valid.auditTrail()));
     }
 
     @Test

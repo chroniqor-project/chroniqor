@@ -5,15 +5,20 @@
 
 package chroniqor.core.replay;
 
+import chroniqor.core.audit.AuditEventType;
+import chroniqor.core.audit.AuditRecorder;
+import chroniqor.core.audit.AuditTrail;
 import chroniqor.core.dataset.MarketDataset;
 import chroniqor.core.market.MarketBar;
 import chroniqor.core.strategy.MarketHistory;
 import chroniqor.core.strategy.Strategy;
 import chroniqor.core.strategy.StrategyContext;
 import chroniqor.core.strategy.StrategyDecision;
+import chroniqor.core.strategy.StrategyMetadata;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public final class ReplayEngine {
@@ -30,10 +35,37 @@ public final class ReplayEngine {
 
         List<ReplayStep> steps = new ArrayList<>(dataset.size());
 
+        AuditRecorder audit = new AuditRecorder();
+
+        StrategyMetadata strategyMetadata =
+                Objects.requireNonNull(strategy.metadata(), "Strategy metadata must not be null");
+
+        audit.record(
+                AuditEventType.REPLAY_STARTED,
+                clock.now(),
+                Map.of(
+                        "datasetId", dataset.identity().datasetId(),
+                        "datasetVersion", dataset.identity().version(),
+                        "datasetContentHash", dataset.identity().contentHash(),
+                        "instrument", dataset.identity().instrument().symbol(),
+                        "timeframe", dataset.identity().timeframe().name(),
+                        "barCount", Integer.toString(dataset.identity().barCount()),
+                        "strategyId", strategyMetadata.id(),
+                        "strategyVersion", strategyMetadata.version()));
+
         for (int index = 0; index < dataset.size(); index++) {
             MarketBar currentBar = dataset.bars().get(index);
 
             clock.advanceTo(currentBar.availableAt());
+
+            audit.record(
+                    AuditEventType.MARKET_BAR_AVAILABLE,
+                    clock.now(),
+                    Map.of(
+                            "barIndex",
+                            Integer.toString(index),
+                            "barStartTime",
+                            currentBar.startTime().toString()));
 
             MarketHistory history = MarketHistory.fromDataset(dataset, index + 1);
 
@@ -44,13 +76,28 @@ public final class ReplayEngine {
             StrategyDecision decision =
                     Objects.requireNonNull(strategy.evaluate(context), "Strategy decision must not be null");
 
+            audit.record(
+                    AuditEventType.STRATEGY_DECISION_RECORDED,
+                    clock.now(),
+                    Map.of("barIndex", Integer.toString(index), "decision", decision.code()));
+
             steps.add(new ReplayStep(index, clock.now(), currentBar, decision));
         }
         validateReplaySteps(dataset, steps);
 
         Instant completeAt = clock.now();
 
-        return new ReplayResult(dataset.identity(), strategy.metadata(), firstBar.startTime(), completeAt, steps);
+        audit.record(
+                AuditEventType.REPLAY_COMPLETED,
+                completeAt,
+                Map.of(
+                        "processedBars", Integer.toString(steps.size()),
+                        "strategyDecisionCount", Integer.toString(steps.size())));
+
+        AuditTrail auditTrail = audit.snapshot();
+
+        return new ReplayResult(
+                dataset.identity(), strategyMetadata, firstBar.startTime(), completeAt, steps, auditTrail);
     }
 
     private static void validateReplaySteps(MarketDataset dataset, List<ReplayStep> steps) {

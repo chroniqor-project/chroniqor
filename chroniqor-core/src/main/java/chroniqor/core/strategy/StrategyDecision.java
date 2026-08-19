@@ -5,4 +5,7 @@
 
 package chroniqor.core.strategy;
 
-public sealed interface StrategyDecision permits NoAction {}
+public sealed interface StrategyDecision permits NoAction {
+
+    String code();
+}
