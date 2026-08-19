@@ -7,8 +7,28 @@ package chroniqor.core.market;
 
 import java.util.Objects;
 
+/**
+ * Immutable OHLC prices satisfying the usual high/low containment
+ * invariant.
+ *
+ * @param open opening price
+ * @param high highest price, not below {@code low}
+ * @param low lowest price
+ * @param close closing price
+ */
 public record Ohlc(Price open, Price high, Price low, Price close) {
 
+    /**
+     * Validates the OHLC containment invariant.
+     *
+     * @param open opening price
+     * @param high high price
+     * @param low low price
+     * @param close closing price
+     * @throws IllegalArgumentException if high is below low, or open/close
+     *     falls outside the low-to-high range
+     * @throws NullPointerException if a price is null
+     */
     public Ohlc {
         Objects.requireNonNull(open, "Open price must not be null");
         Objects.requireNonNull(high, "High price must not be null");

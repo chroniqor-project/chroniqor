@@ -10,6 +10,18 @@ import chroniqor.core.instrument.Timeframe;
 import java.time.Instant;
 import java.util.Objects;
 
+/**
+ * Immutable identity and integrity metadata for a market dataset.
+ *
+ * @param datasetId stable logical dataset identifier
+ * @param version caller-defined dataset version
+ * @param instrument instrument contained by the dataset
+ * @param timeframe bar timeframe
+ * @param startTime start of the first bar
+ * @param endTime end of the last bar
+ * @param barCount number of bars in the dataset
+ * @param contentHash lowercase SHA-256 hash of the canonical bar content
+ */
 public record DatasetIdentity(
         String datasetId,
         String version,
@@ -20,6 +32,22 @@ public record DatasetIdentity(
         int barCount,
         String contentHash) {
 
+    /**
+     * Validates the identity fields and content hash.
+     *
+     * @param datasetId stable dataset identifier
+     * @param version dataset version
+     * @param instrument dataset instrument
+     * @param timeframe bar timeframe
+     * @param startTime first bar start time
+     * @param endTime last bar end time
+     * @param barCount number of bars
+     * @param contentHash canonical content hash
+     * @throws IllegalArgumentException if a text field is blank or padded, the
+     *     time range is invalid, the bar count is not positive, or the hash is
+     *     not a lowercase SHA-256 value
+     * @throws NullPointerException if a required value is null
+     */
     public DatasetIdentity {
         datasetId = requireNonBlank(datasetId, "Dataset id");
         version = requireNonBlank(version, "Dataset version");

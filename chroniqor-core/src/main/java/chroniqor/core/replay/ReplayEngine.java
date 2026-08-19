@@ -21,8 +21,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Runs a strategy over an immutable dataset with an explicit virtual clock
+ * and deterministic audit trail.
+ *
+ * <p>At each step the strategy receives only the prefix of bars whose
+ * availability time has been reached. The engine never consults host time or
+ * infrastructure services.
+ */
 public final class ReplayEngine {
 
+    /** Creates a replay engine with no external state. */
+    public ReplayEngine() {}
+
+    /**
+     * Replays {@code strategy} over every bar in {@code dataset}.
+     *
+     * @param dataset immutable, chronologically ordered market dataset
+     * @param strategy strategy to evaluate at each available bar
+     * @return validated replay result with steps and audit trail
+     * @throws NullPointerException if {@code dataset}, {@code strategy}, its
+     *     metadata, or a returned decision is null
+     * @throws IllegalStateException if the strategy context time becomes
+     *     unsynchronized or generated steps do not match the dataset
+     */
     public ReplayResult run(MarketDataset dataset, Strategy strategy) {
 
         Objects.requireNonNull(dataset, "Market dataset must not be null");

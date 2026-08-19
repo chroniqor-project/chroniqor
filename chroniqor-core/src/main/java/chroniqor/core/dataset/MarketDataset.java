@@ -11,6 +11,14 @@ import chroniqor.core.market.MarketBar;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable sequence of non-overlapping bars for one instrument and
+ * timeframe.
+ *
+ * <p>The factory computes the content hash. All exposed collections are
+ * unmodifiable, and construction validates that identity metadata matches the
+ * actual bars.
+ */
 public final class MarketDataset {
 
     private final DatasetIdentity identity;
@@ -28,6 +36,18 @@ public final class MarketDataset {
         validateIdentity(this.identity, this.bars);
     }
 
+    /**
+     * Creates a validated dataset and derives its identity from the bars.
+     *
+     * @param datasetId stable logical dataset identifier
+     * @param version caller-defined dataset version
+     * @param bars non-empty bars ordered by start time
+     * @return immutable market dataset
+     * @throws IllegalArgumentException if the bars are empty, heterogeneous,
+     *     duplicated, overlapping, or out of order, or if identity text is
+     *     invalid
+     * @throws NullPointerException if an argument or bar is null
+     */
     public static MarketDataset of(String datasetId, String version, List<MarketBar> bars) {
         Objects.requireNonNull(bars, "Market bars must not be null");
 
@@ -64,14 +84,29 @@ public final class MarketDataset {
         return new MarketDataset(identity, bars);
     }
 
+    /**
+     * Returns the dataset identity, including its content fingerprint.
+     *
+     * @return immutable dataset identity
+     */
     public DatasetIdentity identity() {
         return identity;
     }
 
+    /**
+     * Returns the bars in chronological order.
+     *
+     * @return unmodifiable ordered bar list
+     */
     public List<MarketBar> bars() {
         return bars;
     }
 
+    /**
+     * Returns the number of bars.
+     *
+     * @return bar count
+     */
     public int size() {
         return bars.size();
     }

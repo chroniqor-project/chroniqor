@@ -12,6 +12,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Immutable result of one deterministic strategy replay.
+ *
+ * @param dataset identity of the replayed dataset
+ * @param strategy metadata of the evaluated strategy
+ * @param startedAt start time of the first bar
+ * @param completedAt availability time of the final bar
+ * @param steps ordered per-bar replay outcomes
+ * @param auditTrail complete audit stream for the run
+ */
 public record ReplayResult(
         DatasetIdentity dataset,
         StrategyMetadata strategy,
@@ -20,6 +30,19 @@ public record ReplayResult(
         List<ReplayStep> steps,
         AuditTrail auditTrail) {
 
+    /**
+     * Validates temporal, step and audit consistency for a completed replay.
+     *
+     * @param dataset dataset identity
+     * @param strategy strategy metadata
+     * @param startedAt replay start time
+     * @param completedAt replay completion time
+     * @param steps ordered replay steps
+     * @param auditTrail complete audit trail
+     * @throws IllegalArgumentException if the result is empty or its temporal,
+     *     step, or audit invariants do not match
+     * @throws NullPointerException if a required value is null
+     */
     public ReplayResult {
         Objects.requireNonNull(dataset, "Replay dataset identity must not be null");
         Objects.requireNonNull(strategy, "Replay strategy metadata must not be null");
@@ -62,6 +85,11 @@ public record ReplayResult(
         validateSteps(steps);
     }
 
+    /**
+     * Returns the number of processed market bars.
+     *
+     * @return number of replay steps
+     */
     public int processedBars() {
         return steps.size();
     }
