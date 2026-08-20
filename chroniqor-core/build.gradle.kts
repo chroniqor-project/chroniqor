@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.Test
 val verboseTestLogging = providers.gradleProperty("verboseTestLogging").isPresent
 
 dependencies {
-  compileOnlyApi("org.jspecify:jspecify:1.0.0")
+  compileOnlyApi("org.jspecify:jspecify:1.0.1")
 
 	testImplementation(platform("org.junit:junit-bom:6.1.3"))
 
