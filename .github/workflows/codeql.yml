@@ -1,4 +1,4 @@
-name: CI
+name: CodeQL
 
 on:
   pull_request:
@@ -7,22 +7,17 @@ on:
   push:
     branches: [main, develop]
 
+  schedule:
+    - cron: '20 4 * * 1'
+
 permissions:
   contents: read
-
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  security-events: write
 
 jobs:
-  verify:
-    name: Verify - Java ${{ matrix.java }}
+  analyze:
+    name: CodeQL analysis
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        java: ['21', '25']
 
     steps:
       - name: Checkout repository
@@ -31,8 +26,14 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v5.7.0
         with:
-          java-version: ${{ matrix.java }}
+          java-version: '21'
           distribution: temurin
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: java-kotlin
+          queries: security-extended
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6.3.0
@@ -42,5 +43,8 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Verify project
-        run: ./gradlew clean check -PjavaVersion=${{ matrix.java }}
+      - name: Build project
+        run: ./gradlew clean classes testClasses
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
