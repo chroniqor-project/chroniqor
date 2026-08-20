@@ -13,6 +13,9 @@ plugins {
 group = "io.github.cvcg11.chroniqor"
 version = "0.1.0-SNAPSHOT"
 
+val javaToolchainVersion =
+    providers.gradleProperty("javaVersion").orElse("21").map { it.toInt() }
+
 allprojects {
     repositories {
         mavenCentral()
@@ -26,7 +29,7 @@ subprojects {
     version = rootProject.version
 
     the<JavaPluginExtension>().toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(javaToolchainVersion.get())
     }
 
     tasks.withType<JavaCompile>().configureEach {

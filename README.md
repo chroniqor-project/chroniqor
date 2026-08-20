@@ -75,10 +75,22 @@ On Windows:
 .\gradlew.bat clean check
 ```
 
+To run the same Java 25 toolchain validation locally, use:
+
+```powershell
+.\gradlew.bat clean check -PjavaVersion=25
+```
+
 On Linux and macOS:
 
 ```bash
 ./gradlew clean check
+```
+
+To run the Java 25 toolchain validation locally, use:
+
+```bash
+./gradlew clean check -PjavaVersion=25
 ```
 
 ### Optional local formatting hook
