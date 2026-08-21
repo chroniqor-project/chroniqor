@@ -35,11 +35,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: temurin
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6.3.0
-        with:
-          cache-provider: basic
+          cache: gradle
 
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew

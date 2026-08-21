@@ -30,17 +30,13 @@ jobs:
         with:
           java-version: '21'
           distribution: temurin
+          cache: gradle
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: java-kotlin
           queries: security-extended
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6.3.0
-        with:
-          cache-provider: basic
 
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
