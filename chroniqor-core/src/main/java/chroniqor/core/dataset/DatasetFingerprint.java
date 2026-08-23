@@ -15,12 +15,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.List;
 
+/** Internal SHA-256 service for canonical market-dataset content. */
 final class DatasetFingerprint {
 
     private static final String SCHEMA = "chroniqor-market-dataset-v1";
 
     private DatasetFingerprint() {}
 
+    /**
+     * Computes a deterministic fingerprint from dataset identity and bars.
+     *
+     * @param instrument dataset instrument
+     * @param timeframe dataset timeframe
+     * @param bars ordered dataset bars
+     * @return 64-character lowercase hexadecimal hash
+     * @throws IllegalStateException if the runtime does not provide SHA-256
+     */
     static String sha256(CurrencyPair instrument, Timeframe timeframe, List<MarketBar> bars) {
         MessageDigest digest = sha256Digest();
 

@@ -12,11 +12,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Produces the stable binary representation used by the audit fingerprint.
+ *
+ * <p>This implementation detail is intentionally package-private; callers
+ * consume the resulting fingerprint through {@link AuditTrail}.
+ */
 final class AuditCanonicalizer {
     private static final String SCHEMA = "chroniqor-audit-v1";
 
     private AuditCanonicalizer() {}
 
+    /**
+     * Serializes the trail using a versioned schema and sorted attributes.
+     *
+     * @param trail validated audit trail
+     * @return canonical binary representation
+     */
     static byte[] canonicalizer(AuditTrail trail) {
 
         try {
@@ -59,6 +71,7 @@ final class AuditCanonicalizer {
         }
     }
 
+    /** Writes a UTF-8 string preceded by its byte length. */
     private static void writeString(DataOutputStream output, String value) throws IOException {
 
         byte[] encoded = value.getBytes(StandardCharsets.UTF_8);

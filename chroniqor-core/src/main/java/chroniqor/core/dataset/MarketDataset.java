@@ -80,6 +80,16 @@ public final class MarketDataset {
         return new MarketDataset(identity, immutableBars);
     }
 
+    /**
+     * Reconstructs a dataset from persisted identity metadata after validating
+     * that the metadata matches the supplied bars.
+     *
+     * @param identity persisted dataset identity
+     * @param bars ordered dataset bars
+     * @return validated immutable dataset
+     * @throws IllegalArgumentException if identity and bars do not match
+     * @throws NullPointerException if an argument or bar is null
+     */
     static MarketDataset fromIdentity(DatasetIdentity identity, List<MarketBar> bars) {
         return new MarketDataset(identity, bars);
     }
