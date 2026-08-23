@@ -9,10 +9,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
+/** Internal SHA-256 service for canonical audit trails. */
 final class AuditFingerprint {
 
     private AuditFingerprint() {}
 
+    /**
+     * Computes the lowercase SHA-256 fingerprint of a canonical trail.
+     *
+     * @param trail validated audit trail
+     * @return 64-character lowercase hexadecimal hash
+     * @throws IllegalStateException if the runtime does not provide SHA-256
+     */
     static String sha256(AuditTrail trail) {
 
         try {
